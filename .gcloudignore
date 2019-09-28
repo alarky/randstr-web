@@ -12,6 +12,8 @@
 # below:
 .git
 .gitignore
+.*
+randstr
 
 # Binaries for programs and plugins
 *.exe
