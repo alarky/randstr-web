@@ -2,57 +2,11 @@ import React, {ReactNode} from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import * as charactors from "./charactors";
-import Random from './random';
+import {IAppProps, IAppState} from "./types";
+import RandomString from "./randstr";
 
 const DEFAULT_COUNT = 12;
 const DEFAULT_LENGTH = 16;
-
-interface IAppProps {
-}
-
-interface IAppState {
-    count: number;
-    length: number;
-
-    useLowers: boolean;
-    useUppers: boolean;
-    useDigits: boolean;
-    useSymbols: boolean;
-    useExclamationMark: boolean;
-    useDoubleQuotationMark: boolean;
-    useNumberSign: boolean;
-    useDollarSign: boolean;
-    usePercentSign: boolean;
-    useAmpersandSign: boolean;
-    useApostrophe: boolean;
-    useLeftParenthesis: boolean;
-    useRightParenthesis: boolean;
-    useAsterisk: boolean;
-    usePlusSign: boolean;
-    useComma: boolean;
-    useMinusSign: boolean;
-    usePeriod: boolean;
-    useSlash: boolean;
-    useColon: boolean;
-    useSemicolon: boolean;
-    useLessThanSign: boolean;
-    useEqualSign: boolean;
-    useGreaterThanSign: boolean;
-    useQuestionMark: boolean;
-    useCommercialAtSign: boolean;
-    useLeftSquareBracket: boolean;
-    useBackslash: boolean;
-    useRightSquareBracket: boolean;
-    useSpacingCircumflexAccent: boolean;
-    useSpacingUnderscore: boolean;
-    useSpacingGraveAccent: boolean;
-    useLeftBrace: boolean;
-    useVerticalBar: boolean;
-    useRightBrace: boolean;
-    useTildeAccent: boolean;
-
-    randStrings: string[]
-}
 
 class App extends React.Component<IAppProps, IAppState> {
     constructor(props: IAppProps) {
@@ -108,125 +62,7 @@ class App extends React.Component<IAppProps, IAppState> {
     }
 
     generate() {
-        let c = '';
-        if (this.state.useLowers) {
-            c += charactors.LOWERS;
-        }
-        if (this.state.useUppers) {
-            c += charactors.UPPERS;
-        }
-        if (this.state.useDigits) {
-            c += charactors.DIGITS;
-        }
-
-        if (this.state.useExclamationMark) {
-            c += charactors.EXCLAMATION_MARK;
-        }
-        if (this.state.useDoubleQuotationMark) {
-            c += charactors.DOUBLE_QUOTATION_MARK;
-        }
-        if (this.state.useNumberSign) {
-            c += charactors.NUMBER_SIGN;
-        }
-        if (this.state.useDollarSign) {
-            c += charactors.DOLLAR_SIGN;
-        }
-        if (this.state.usePercentSign) {
-            c += charactors.PERCENT_SIGN;
-        }
-        if (this.state.useAmpersandSign) {
-            c += charactors.AMPERSAND_SIGN;
-        }
-        if (this.state.useApostrophe) {
-            c += charactors.APOSTROPHE;
-        }
-        if (this.state.useLeftParenthesis) {
-            c += charactors.LEFT_PARENTHESIS;
-        }
-        if (this.state.useRightParenthesis) {
-            c += charactors.RIGHT_PARENTHESIS;
-        }
-        if (this.state.useAsterisk) {
-            c += charactors.ASTERISK;
-        }
-        if (this.state.usePlusSign) {
-            c += charactors.PLUS_SIGN;
-        }
-        if (this.state.useComma) {
-            c += charactors.COMMA;
-        }
-        if (this.state.useMinusSign) {
-            c += charactors.MINUS_SIGN;
-        }
-        if (this.state.usePeriod) {
-            c += charactors.PERIOD;
-        }
-        if (this.state.useSlash) {
-            c += charactors.SLASH;
-        }
-        if (this.state.useColon) {
-            c += charactors.COLON;
-        }
-        if (this.state.useSemicolon) {
-            c += charactors.SEMICOLON;
-        }
-        if (this.state.useLessThanSign) {
-            c += charactors.LESS_THAN_SIGN;
-        }
-        if (this.state.useEqualSign) {
-            c += charactors.EQUAL_SIGN;
-        }
-        if (this.state.useGreaterThanSign) {
-            c += charactors.GREATER_THAN_SIGN;
-        }
-        if (this.state.useQuestionMark) {
-            c += charactors.QUESTION_MARK;
-        }
-        if (this.state.useCommercialAtSign) {
-            c += charactors.COMMERCIAL_AT_SIGN;
-        }
-        if (this.state.useLeftSquareBracket) {
-            c += charactors.LEFT_SQUARE_BRACKET;
-        }
-        if (this.state.useBackslash) {
-            c += charactors.BACKSLASH;
-        }
-        if (this.state.useRightSquareBracket) {
-            c += charactors.RIGHT_SQUARE_BRACKET;
-        }
-        if (this.state.useSpacingCircumflexAccent) {
-            c += charactors.SPACING_CIRCUMFLEX_ACCENT;
-        }
-        if (this.state.useSpacingUnderscore) {
-            c += charactors.SPACING_UNDERSCORE;
-        }
-        if (this.state.useSpacingGraveAccent) {
-            c += charactors.SPACING_GRAVE_ACCENT;
-        }
-        if (this.state.useLeftBrace) {
-            c += charactors.LEFT_BRACE;
-        }
-        if (this.state.useVerticalBar) {
-            c += charactors.VERTICAL_BAR;
-        }
-        if (this.state.useRightBrace) {
-            c += charactors.RIGHT_BRACE;
-        }
-        if (this.state.useTildeAccent) {
-            c += charactors.TILDE_ACCENT;
-        }
-
-        if (!c.length) {
-            return;
-        }
-
-        let strs: string[] = [];
-        for (let i = 0; i < this.state.count; i++) {
-            const r = Random.randStr(c, this.state.length);
-            strs.push(r);
-        }
-
-        this.setState({randStrings: strs});
+        this.setState({randStrings: RandomString.generate(this.state)});
     }
 
     changeHandler(state: object) {
