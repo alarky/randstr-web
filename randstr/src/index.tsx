@@ -160,6 +160,7 @@ class App extends React.Component<IAppProps, IAppState> {
                            onChange={(e) => this.changeHandler({length: parseInt(e.target.value) || 0})} />
                     x<input value={this.state.count}
                             onChange={(e) => this.changeHandler({count: parseInt(e.target.value) || 0})}/>
+                    <button onClick={() => this.generate()}>Generate</button>
                 </div>
                 <div>
                     <input type="checkbox"

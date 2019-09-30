@@ -82,8 +82,7 @@ export default class RandomString {
 
         let strs: string[] = [];
         for (let i = 0; i < state.count; i++) {
-            const r = Random.randStr(c, state.length);
-            strs.push(r);
+            strs.push(Random.randStr(c, state.length));
         }
 
         return strs;
