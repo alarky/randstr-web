@@ -4,6 +4,9 @@ import './index.css';
 import * as charactors from "./charactors";
 import Random from './random';
 
+const DEFAULT_COUNT = 12;
+const DEFAULT_LENGTH = 16;
+
 interface IAppProps {
 }
 
@@ -56,8 +59,9 @@ class App extends React.Component<IAppProps, IAppState> {
         super(props);
 
         this.state = {
-            count: 12,
-            length: 16,
+            count: DEFAULT_COUNT,
+            length: DEFAULT_LENGTH,
+
             useLowers: true,
             useUppers: true,
             useDigits: true,
@@ -99,7 +103,7 @@ class App extends React.Component<IAppProps, IAppState> {
         };
     }
 
-    componentWillMount() {
+    componentDidMount() {
         this.generate();
     }
 
