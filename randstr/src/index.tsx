@@ -1,13 +1,14 @@
-import React, {ChangeEvent, ReactNode} from 'react';
+import React, {ReactNode} from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import * as charactors from "./charactors";
+import Random from './random';
 
 interface IAppProps {
 }
 
 interface IAppState {
-    howmany: number;
+    count: number;
     length: number;
 
     useLowers: boolean;
@@ -47,7 +48,7 @@ interface IAppState {
     useRightBrace: boolean;
     useTildeAccent: boolean;
 
-    randstrs: string[]
+    randStrings: string[]
 }
 
 class App extends React.Component<IAppProps, IAppState> {
@@ -55,7 +56,7 @@ class App extends React.Component<IAppProps, IAppState> {
         super(props);
 
         this.state = {
-            howmany: 12,
+            count: 12,
             length: 16,
             useLowers: true,
             useUppers: true,
@@ -94,7 +95,7 @@ class App extends React.Component<IAppProps, IAppState> {
             useRightBrace: false,
             useTildeAccent: false,
 
-            randstrs: [],
+            randStrings: [],
         };
     }
 
@@ -216,18 +217,12 @@ class App extends React.Component<IAppProps, IAppState> {
         }
 
         let strs: string[] = [];
-        for (let i = 0; i < this.state.howmany; i++) {
-            let ints = new Uint32Array(this.state.length);
-            window.crypto.getRandomValues(ints);
-
-            let r = '';
-            for (let j = 0; j < this.state.length; j++) {
-                r += c[ints[j] % c.length];
-            }
+        for (let i = 0; i < this.state.count; i++) {
+            const r = Random.randStr(c, this.state.length);
             strs.push(r);
         }
 
-        this.setState({randstrs: strs});
+        this.setState({randStrings: strs});
     }
 
     changeHandler(state: object) {
@@ -323,8 +318,8 @@ class App extends React.Component<IAppProps, IAppState> {
                 <div>
                     length:<input value={this.state.length}
                            onChange={(e) => this.changeHandler({length: parseInt(e.target.value) || 0})} />
-                    x<input value={this.state.howmany}
-                            onChange={(e) => this.changeHandler({howmany: parseInt(e.target.value) || 0})}/>
+                    x<input value={this.state.count}
+                            onChange={(e) => this.changeHandler({count: parseInt(e.target.value) || 0})}/>
                 </div>
                 <div>
                     <input type="checkbox"
@@ -478,7 +473,7 @@ class App extends React.Component<IAppProps, IAppState> {
                 </div>
 
                 <ul>
-                    {this.state.randstrs.map((randstr: string, i: number) => {
+                    {this.state.randStrings.map((randstr: string, i: number) => {
                         return <li key={i}>{randstr}</li>
                     })}
                 </ul>
