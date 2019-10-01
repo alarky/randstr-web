@@ -4,57 +4,12 @@ import './index.css';
 import * as charactors from "./charactors";
 import {IAppProps, IAppState} from "./types";
 import RandomString from "./randstr";
-
-const DEFAULT_COUNT = 12;
-const DEFAULT_LENGTH = 16;
+import Appstate from "./appstate";
 
 class App extends React.Component<IAppProps, IAppState> {
     constructor(props: IAppProps) {
         super(props);
-
-        this.state = {
-            count: DEFAULT_COUNT,
-            length: DEFAULT_LENGTH,
-
-            useLowers: true,
-            useUppers: true,
-            useDigits: true,
-            useSymbols: false,
-            useExclamationMark: false,
-            useDoubleQuotationMark: false,
-            useNumberSign: false,
-            useDollarSign: false,
-            usePercentSign: false,
-            useAmpersandSign: false,
-            useApostrophe: false,
-            useLeftParenthesis: false,
-            useRightParenthesis: false,
-            useAsterisk: false,
-            usePlusSign: false,
-            useComma: false,
-            useMinusSign: false,
-            usePeriod: false,
-            useSlash: false,
-            useColon: false,
-            useSemicolon: false,
-            useLessThanSign: false,
-            useEqualSign: false,
-            useGreaterThanSign: false,
-            useQuestionMark: false,
-            useCommercialAtSign: false,
-            useLeftSquareBracket: false,
-            useBackslash: false,
-            useRightSquareBracket: false,
-            useSpacingCircumflexAccent: false,
-            useSpacingUnderscore: false,
-            useSpacingGraveAccent: false,
-            useLeftBrace: false,
-            useVerticalBar: false,
-            useRightBrace: false,
-            useTildeAccent: false,
-
-            randStrings: [],
-        };
+        this.state = new Appstate();
     }
 
     componentDidMount() {
@@ -62,10 +17,14 @@ class App extends React.Component<IAppProps, IAppState> {
     }
 
     generate() {
+        if (this.state.hasChanged) {
+            Appstate.save(this.state);
+        }
         this.setState({randStrings: RandomString.generate(this.state)});
     }
 
     changeHandler(state: object) {
+        state = {...state, ...{hasChanged: true}};
         this.setState(state, () => this.generate());
     }
 
@@ -104,12 +63,14 @@ class App extends React.Component<IAppProps, IAppState> {
             useVerticalBar: checked,
             useRightBrace: checked,
             useTildeAccent: checked,
+            hasChanged: true,
         }, () => {
             this.generate();
         })
     }
 
     changeMarkHandler(state: object) {
+        state = {...state, ...{hasChanged: true}};
         this.setState(state, () => {
             if (
                 this.state.useExclamationMark === this.state.useDoubleQuotationMark &&

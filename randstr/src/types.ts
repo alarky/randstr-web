@@ -42,6 +42,7 @@ export interface IAppState {
     useRightBrace: boolean;
     useTildeAccent: boolean;
 
+    hasChanged: boolean;
     randStrings: string[]
 }
 
