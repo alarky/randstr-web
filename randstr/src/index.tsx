@@ -23,6 +23,11 @@ class App extends React.Component<IAppProps, IAppState> {
         this.setState({randStrings: RandomString.generate(this.state)});
     }
 
+    reset() {
+        window.history.replaceState('', '', '/');
+        this.setState(new Appstate());
+    }
+
     changeHandler(state: object) {
         state = {...state, ...{hasChanged: true}};
         this.setState(state, () => this.generate());
@@ -117,11 +122,12 @@ class App extends React.Component<IAppProps, IAppState> {
             <section>
                 <h1>Random Strings</h1>
                 <div>
+                    count:<input value={this.state.count}
+                                onChange={(e) => this.changeHandler({count: parseInt(e.target.value) || 0})}/><br/>
                     length:<input value={this.state.length}
                            onChange={(e) => this.changeHandler({length: parseInt(e.target.value) || 0})} />
-                    x<input value={this.state.count}
-                            onChange={(e) => this.changeHandler({count: parseInt(e.target.value) || 0})}/>
                     <button onClick={() => this.generate()}>Generate</button>
+                    <button onClick={() => this.reset()}>Reset</button>
                 </div>
                 <div>
                     <input type="checkbox"
