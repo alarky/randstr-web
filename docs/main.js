@@ -6,40 +6,16 @@ const SYMBOLS_ROW1 = ['!', '"', '#', '$', '%', '&', "'", '(', ')', '*', '+', ','
 const SYMBOLS_ROW2 = [':', ';', '<', '=', '>', '?', '@', '[', '\\', ']', '^', '_', '`', '{', '|', '}', '~'];
 const ALL_SYMBOLS = [...SYMBOLS_ROW1, ...SYMBOLS_ROW2];
 
-// flags order: useLowers, useUppers, useDigits, useSymbols, then each symbol in ALL_SYMBOLS order
 const DEFAULT_COUNT = 12;
 const DEFAULT_LENGTH = 16;
 const DEFAULT_SYMBOL_MAX = 20;
+
+// --- Random ---
 
 function randChar(pool) {
   const ints = new Uint32Array(1);
   crypto.getRandomValues(ints);
   return pool[Math.floor(ints[0] / (2 ** 32 / pool.length))];
-}
-
-function randStr(alphaPool, symbolPool, symbolMax, length) {
-  if (!alphaPool.length && !symbolPool.length) return '';
-
-  // No limit needed if only one pool type
-  if (!symbolPool.length) return randStrSimple(alphaPool, length);
-  if (!alphaPool.length) return randStrSimple(symbolPool, length);
-
-  const maxSymbolCount = Math.max(0, Math.floor(length * symbolMax / 100));
-  const combined = alphaPool + symbolPool;
-  let symbolCount = 0;
-  let result = '';
-  for (let i = 0; i < length; i++) {
-    if (symbolCount >= maxSymbolCount) {
-      result += randChar(alphaPool);
-    } else {
-      const ch = randChar(combined);
-      if (symbolPool.includes(ch)) {
-        symbolCount++;
-      }
-      result += ch;
-    }
-  }
-  return result;
 }
 
 function randStrSimple(pool, length) {
@@ -53,44 +29,89 @@ function randStrSimple(pool, length) {
   return result;
 }
 
+function randStr(alphaPool, symbolPool, symbolMax, length) {
+  if (!alphaPool.length && !symbolPool.length) return '';
+  if (!symbolPool.length) return randStrSimple(alphaPool, length);
+  if (!alphaPool.length) return randStrSimple(symbolPool, length);
+
+  const maxSymbolCount = Math.max(0, Math.floor(length * symbolMax / 100));
+  const combined = alphaPool + symbolPool;
+  let symbolCount = 0;
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    if (symbolCount >= maxSymbolCount) {
+      result += randChar(alphaPool);
+    } else {
+      const ch = randChar(combined);
+      if (symbolPool.includes(ch)) symbolCount++;
+      result += ch;
+    }
+  }
+  return result;
+}
+
+// --- URL State ---
+// Format: ?c=12&l=16&ch=aA0&sym=all&sm=20
+//   ch: a=lowercase, A=uppercase, 0=digits
+//   sym: all=all symbols, or individual chars (e.g. !%23%24)
+//   sm: symbol max % (omitted when default)
+
 function loadState() {
   const params = new URLSearchParams(location.search);
-  const count = parseInt(params.get('c')) || DEFAULT_COUNT;
-  const length = parseInt(params.get('l')) || DEFAULT_LENGTH;
 
-  const f = params.get('f');
-  const flags = f ? f.split('').map(v => v === '1') : null;
+  const cParam = params.get('c');
+  const lParam = params.get('l');
+  const count = cParam !== null ? parseInt(cParam) || 0 : DEFAULT_COUNT;
+  const length = lParam !== null ? parseInt(lParam) || 0 : DEFAULT_LENGTH;
+  const smParam = params.get('sm');
+  const symbolMax = smParam !== null ? parseInt(smParam) || 0 : DEFAULT_SYMBOL_MAX;
 
-  const useLowers = flags ? flags[0] : true;
-  const useUppers = flags ? flags[1] : true;
-  const useDigits = flags ? flags[2] : true;
-  const useSymbols = flags ? flags[3] : false;
+  const ch = params.get('ch');
+  const useLowers = ch !== null ? ch.includes('a') : true;
+  const useUppers = ch !== null ? ch.includes('A') : true;
+  const useDigits = ch !== null ? ch.includes('0') : true;
 
+  const sym = params.get('sym');
   const symbols = {};
-  ALL_SYMBOLS.forEach((s, i) => {
-    symbols[s] = flags ? (flags[4 + i] || false) : false;
-  });
+  if (sym === null) {
+    ALL_SYMBOLS.forEach(s => { symbols[s] = false; });
+  } else if (sym === 'all') {
+    ALL_SYMBOLS.forEach(s => { symbols[s] = true; });
+  } else {
+    ALL_SYMBOLS.forEach(s => { symbols[s] = sym.includes(s); });
+  }
 
-  const symbolMax = parseInt(params.get('sm')) || DEFAULT_SYMBOL_MAX;
+  const useSymbols = ALL_SYMBOLS.every(s => symbols[s]);
 
   return { count, length, useLowers, useUppers, useDigits, useSymbols, symbols, symbolMax };
 }
 
 function saveState(data) {
-  const flags = [
-    data.useLowers, data.useUppers, data.useDigits, data.useSymbols,
-    ...ALL_SYMBOLS.map(s => data.symbols[s]),
-  ].map(v => v ? '1' : '0').join('');
-
   const params = new URLSearchParams();
   params.set('c', '' + data.count);
   params.set('l', '' + data.length);
-  params.set('f', flags);
+
+  let ch = '';
+  if (data.useLowers) ch += 'a';
+  if (data.useUppers) ch += 'A';
+  if (data.useDigits) ch += '0';
+  params.set('ch', ch);
+
+  const activeSymbols = ALL_SYMBOLS.filter(s => data.symbols[s]);
+  if (activeSymbols.length === ALL_SYMBOLS.length) {
+    params.set('sym', 'all');
+  } else if (activeSymbols.length > 0) {
+    params.set('sym', activeSymbols.join(''));
+  }
+
   if (data.symbolMax !== DEFAULT_SYMBOL_MAX) {
     params.set('sm', '' + data.symbolMax);
   }
+
   history.replaceState('', '', '?' + params.toString());
 }
+
+// --- Alpine Component ---
 
 function randstr() {
   const state = loadState();
@@ -115,10 +136,7 @@ function randstr() {
       if (this.useLowers) alphaPool += LOWERS;
       if (this.useUppers) alphaPool += UPPERS;
       if (this.useDigits) alphaPool += DIGITS;
-      let symbolPool = '';
-      ALL_SYMBOLS.forEach(s => {
-        if (this.symbols[s]) symbolPool += s;
-      });
+      const symbolPool = ALL_SYMBOLS.filter(s => this.symbols[s]).join('');
 
       this.results = [];
       if (!alphaPool.length && !symbolPool.length) return;
@@ -162,9 +180,7 @@ function randstr() {
       const toast = document.createElement('span');
       toast.textContent = 'Copied!';
       toast.className = 'toast';
-      const li = event.currentTarget;
-      li.style.position = 'relative';
-      li.appendChild(toast);
+      event.currentTarget.appendChild(toast);
       setTimeout(() => toast.remove(), 800);
     },
 

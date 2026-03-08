@@ -2,6 +2,11 @@ body {
   font-family: system-ui, sans-serif;
 }
 
+h1 a {
+  text-decoration: none;
+  color: inherit;
+}
+
 /* Buttons side by side */
 .btn-group {
   display: flex;
@@ -78,6 +83,7 @@ fieldset input[type="checkbox"] {
   list-style: none;
   display: block;
   cursor: pointer;
+  position: relative;
   padding: 0.5rem 0.75rem;
   margin-bottom: 0.3rem;
   background: var(--pico-card-background-color);
