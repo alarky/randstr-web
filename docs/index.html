@@ -62,7 +62,7 @@
 
     <ul class="results">
       <template x-for="(s, i) in results" :key="i">
-        <li @click="copy(s, $event)" :class="copied === s && 'copied'" style="cursor:pointer" x-text="s"></li>
+        <li @click="copy(s, i, $event)" :class="copiedIndex === i && 'copied'" x-text="s"></li>
       </template>
     </ul>
   </main>

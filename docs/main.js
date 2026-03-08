@@ -24,18 +24,14 @@ function randStr(alphaPool, symbolPool, symbolMax, length) {
   if (!symbolPool.length) return randStrSimple(alphaPool, length);
   if (!alphaPool.length) return randStrSimple(symbolPool, length);
 
-  const maxSymbolCount = Math.floor(length * symbolMax / 100);
+  const maxSymbolCount = Math.max(0, Math.floor(length * symbolMax / 100));
+  const combined = alphaPool + symbolPool;
   let symbolCount = 0;
   let result = '';
   for (let i = 0; i < length; i++) {
-    const remaining = length - i;
-    const symbolsLeft = maxSymbolCount - symbolCount;
-    // Must use alpha (symbol limit reached), or can pick from either pool
-    if (symbolsLeft <= 0) {
+    if (symbolCount >= maxSymbolCount) {
       result += randChar(alphaPool);
     } else {
-      // Pick from combined pool, but track symbol usage
-      const combined = alphaPool + symbolPool;
       const ch = randChar(combined);
       if (symbolPool.includes(ch)) {
         symbolCount++;
@@ -111,7 +107,7 @@ function randstr() {
     symbolsRow1: SYMBOLS_ROW1,
     symbolsRow2: SYMBOLS_ROW2,
     results: [],
-    copied: null,
+    copiedIndex: -1,
     _copiedTimer: null,
 
     generate() {
@@ -126,8 +122,10 @@ function randstr() {
 
       this.results = [];
       if (!alphaPool.length && !symbolPool.length) return;
-      for (let i = 0; i < this.count; i++) {
-        this.results.push(randStr(alphaPool, symbolPool, this.symbolMax, this.length));
+      const count = Math.max(0, this.count || 0);
+      const len = Math.max(0, this.length || 0);
+      for (let i = 0; i < count; i++) {
+        this.results.push(randStr(alphaPool, symbolPool, this.symbolMax, len));
       }
     },
 
@@ -155,11 +153,11 @@ function randstr() {
       this.onChange();
     },
 
-    copy(s, event) {
+    copy(s, i, event) {
       navigator.clipboard.writeText(s);
-      this.copied = s;
+      this.copiedIndex = i;
       clearTimeout(this._copiedTimer);
-      this._copiedTimer = setTimeout(() => { this.copied = null; }, 1000);
+      this._copiedTimer = setTimeout(() => { this.copiedIndex = -1; }, 1000);
 
       const toast = document.createElement('span');
       toast.textContent = 'Copied!';
