@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Random Strings</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="main.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+</head>
+<body>
+  <section x-data="randstr()" x-init="generate()">
+    <h1>Random Strings</h1>
+
+    <div>
+      count:<input type="text" x-model.number="count" @input="onChange()"><br>
+      length:<input type="text" x-model.number="length" @input="onChange()">
+      <button @click="generate()">Generate</button>
+      <button @click="reset()">Reset</button>
+    </div>
+
+    <div>
+      <label><input type="checkbox" x-model="useLowers" @change="onChange()">a-z</label>
+      <label><input type="checkbox" x-model="useUppers" @change="onChange()">A-Z</label>
+      <label><input type="checkbox" x-model="useDigits" @change="onChange()">0-9</label>
+      <label><input type="checkbox" x-model="useSymbols" @change="toggleAllSymbols()">symbols</label>
+      <template x-if="hasAnySymbol()">
+        <span>
+          max:<input type="text" x-model.number="symbolMax" @input="onChange()" size="3">%
+        </span>
+      </template>
+    </div>
+
+    <div>
+      <template x-for="s in symbolsRow1" :key="s">
+        <label>
+          <input type="checkbox" :checked="symbols[s]" @change="toggleSymbol(s, $event.target.checked)">
+          <span x-text="s"></span>
+        </label>
+      </template>
+    </div>
+    <div>
+      <template x-for="s in symbolsRow2" :key="s">
+        <label>
+          <input type="checkbox" :checked="symbols[s]" @change="toggleSymbol(s, $event.target.checked)">
+          <span x-text="s"></span>
+        </label>
+      </template>
+    </div>
+
+    <ul>
+      <template x-for="(s, i) in results" :key="i">
+        <li x-text="s"></li>
+      </template>
+    </ul>
+  </section>
+</body>
+</html>
