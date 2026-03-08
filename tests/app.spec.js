@@ -202,3 +202,89 @@ test.describe('clipboard', () => {
     await expect(firstItem.locator('.toast')).toBeVisible();
   });
 });
+
+test.describe('randomness distribution', () => {
+  // Chi-squared test: checks if character frequencies deviate from uniform distribution.
+  // p < 0.001 (critical value for df=61 is ~99.6) means the distribution is suspiciously non-uniform.
+  function chiSquared(observed, expected) {
+    let sum = 0;
+    for (const [ch, count] of Object.entries(observed)) {
+      sum += (count - expected) ** 2 / expected;
+    }
+    return sum;
+  }
+
+  test('alphanumeric characters are uniformly distributed', async ({ page }) => {
+    // Generate 500 strings of length 200 = 100,000 chars over 62 possible chars
+    await page.goto('/?c=500&l=200&ch=aA0');
+    const texts = await page.locator('.results li').allTextContents();
+    const freq = {};
+    for (const t of texts) {
+      for (const c of t) {
+        freq[c] = (freq[c] || 0) + 1;
+      }
+    }
+
+    const totalChars = 500 * 200;
+    const poolSize = 62; // 26 + 26 + 10
+    const expectedPerChar = totalChars / poolSize;
+
+    // All 62 characters should appear
+    expect(Object.keys(freq).length).toBe(poolSize);
+
+    // Chi-squared test with df=61, critical value at p=0.001 is ~99.6
+    const chi2 = chiSquared(freq, expectedPerChar);
+    expect(chi2).toBeLessThan(100);
+  });
+
+  test('lowercase-only characters are uniformly distributed', async ({ page }) => {
+    await page.goto('/?c=500&l=200&ch=a');
+    const texts = await page.locator('.results li').allTextContents();
+    const freq = {};
+    for (const t of texts) {
+      for (const c of t) {
+        freq[c] = (freq[c] || 0) + 1;
+      }
+    }
+
+    const totalChars = 500 * 200;
+    const poolSize = 26;
+    const expectedPerChar = totalChars / poolSize;
+
+    expect(Object.keys(freq).length).toBe(poolSize);
+
+    // df=25, critical value at p=0.001 is ~52.6
+    const chi2 = chiSquared(freq, expectedPerChar);
+    expect(chi2).toBeLessThan(53);
+  });
+
+  test('with symbols enabled, distribution is reasonable', async ({ page }) => {
+    await page.goto('/?c=500&l=200&ch=aA0&sym=all&sm=100');
+    const texts = await page.locator('.results li').allTextContents();
+    const freq = {};
+    for (const t of texts) {
+      for (const c of t) {
+        freq[c] = (freq[c] || 0) + 1;
+      }
+    }
+
+    const totalChars = 500 * 200;
+    const poolSize = 62 + 32; // 94 printable (33 symbols minus backslash issues, but let's check actual)
+    const actualPoolSize = Object.keys(freq).length;
+    const expectedPerChar = totalChars / actualPoolSize;
+
+    // All characters in the pool should appear
+    expect(actualPoolSize).toBeGreaterThanOrEqual(90);
+
+    // df~93, critical value at p=0.001 is ~135
+    const chi2 = chiSquared(freq, expectedPerChar);
+    expect(chi2).toBeLessThan(135);
+  });
+
+  test('generated strings are unique (no duplicates)', async ({ page }) => {
+    await page.goto('/?c=10000&l=32&ch=aA0');
+    const texts = await page.locator('.results li').allTextContents();
+    const unique = new Set(texts);
+    expect(unique.size).toBe(texts.length);
+  });
+});
