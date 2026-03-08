@@ -111,6 +111,8 @@ function randstr() {
     symbolsRow1: SYMBOLS_ROW1,
     symbolsRow2: SYMBOLS_ROW2,
     results: [],
+    copied: null,
+    _copiedTimer: null,
 
     generate() {
       let alphaPool = '';
@@ -151,6 +153,21 @@ function randstr() {
         this.useSymbols = this.symbols[ALL_SYMBOLS[0]];
       }
       this.onChange();
+    },
+
+    copy(s, event) {
+      navigator.clipboard.writeText(s);
+      this.copied = s;
+      clearTimeout(this._copiedTimer);
+      this._copiedTimer = setTimeout(() => { this.copied = null; }, 1000);
+
+      const toast = document.createElement('span');
+      toast.textContent = 'Copied!';
+      toast.className = 'toast';
+      const li = event.currentTarget;
+      li.style.position = 'relative';
+      li.appendChild(toast);
+      setTimeout(() => toast.remove(), 800);
     },
 
     reset() {

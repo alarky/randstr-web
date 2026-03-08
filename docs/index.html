@@ -1,58 +1,70 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Random Strings</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
   <link rel="stylesheet" href="style.css">
   <script src="main.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
 </head>
 <body>
-  <section x-data="randstr()" x-init="generate()">
+  <main class="container" x-data="randstr()" x-init="generate()">
     <h1>Random Strings</h1>
 
-    <div>
-      count:<input type="text" x-model.number="count" @input="onChange()"><br>
-      length:<input type="text" x-model.number="length" @input="onChange()">
-      <button @click="generate()">Generate</button>
-      <button @click="reset()">Reset</button>
+    <div class="grid">
+      <label>
+        count
+        <input type="text" x-model.number="count" @input="onChange()">
+      </label>
+      <label>
+        length
+        <input type="text" x-model.number="length" @input="onChange()">
+      </label>
+      <label>
+        &nbsp;
+        <div class="btn-group">
+          <button @click="generate()">Generate</button>
+          <button class="secondary" @click="reset()">Reset</button>
+        </div>
+      </label>
     </div>
 
-    <div>
+    <fieldset>
       <label><input type="checkbox" x-model="useLowers" @change="onChange()">a-z</label>
       <label><input type="checkbox" x-model="useUppers" @change="onChange()">A-Z</label>
       <label><input type="checkbox" x-model="useDigits" @change="onChange()">0-9</label>
       <label><input type="checkbox" x-model="useSymbols" @change="toggleAllSymbols()">symbols</label>
       <template x-if="hasAnySymbol()">
-        <span>
+        <label class="symbol-max">
           max:<input type="text" x-model.number="symbolMax" @input="onChange()" size="3">%
-        </span>
+        </label>
       </template>
-    </div>
+    </fieldset>
 
-    <div>
+    <div class="symbols-grid">
       <template x-for="s in symbolsRow1" :key="s">
-        <label>
+        <label class="symbol-item">
           <input type="checkbox" :checked="symbols[s]" @change="toggleSymbol(s, $event.target.checked)">
           <span x-text="s"></span>
         </label>
       </template>
     </div>
-    <div>
+    <div class="symbols-grid">
       <template x-for="s in symbolsRow2" :key="s">
-        <label>
+        <label class="symbol-item">
           <input type="checkbox" :checked="symbols[s]" @change="toggleSymbol(s, $event.target.checked)">
           <span x-text="s"></span>
         </label>
       </template>
     </div>
 
-    <ul>
+    <ul class="results">
       <template x-for="(s, i) in results" :key="i">
-        <li x-text="s"></li>
+        <li @click="copy(s, $event)" :class="copied === s && 'copied'" style="cursor:pointer" x-text="s"></li>
       </template>
     </ul>
-  </section>
+  </main>
 </body>
 </html>
