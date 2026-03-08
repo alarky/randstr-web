@@ -92,6 +92,7 @@ fieldset input[type="checkbox"] {
   letter-spacing: 0.08em;
   word-break: break-all;
   transition: background 0.15s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .results li:hover {
@@ -99,6 +100,7 @@ fieldset input[type="checkbox"] {
 }
 
 .toast {
+  font-family: system-ui, sans-serif;
   position: absolute;
   right: 0.75rem;
   top: 50%;

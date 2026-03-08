@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -38,11 +38,9 @@
       <label><input type="checkbox" x-model="useUppers" @change="onChange()">A-Z</label>
       <label><input type="checkbox" x-model="useDigits" @change="onChange()">0-9</label>
       <label><input type="checkbox" x-model="useSymbols" @change="toggleAllSymbols()">symbols</label>
-      <template x-if="hasAnySymbol()">
-        <label class="symbol-max">
-          max:<input type="text" x-model.number="symbolMax" @input="onChange()" size="3">%
-        </label>
-      </template>
+      <label class="symbol-max">
+        max:<input type="text" x-model.number="symbolMax" @input="onChange()" size="3">%
+      </label>
     </fieldset>
 
     <div class="symbols-grid">
