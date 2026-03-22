@@ -49,3 +49,7 @@ E2E tests powered by [Playwright](https://playwright.dev/) (24 tests including r
 
 - [SPEC.ja.md](SPEC.ja.md) (日本語)
 - [SPEC.en.md](SPEC.en.md) (English)
+
+## License
+
+MIT

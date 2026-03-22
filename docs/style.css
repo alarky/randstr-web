@@ -124,3 +124,37 @@ fieldset input[type="checkbox"] {
   border-left-color: #2ecc71;
   background: var(--pico-card-sectioning-background-color);
 }
+
+footer {
+  margin-top: 2rem;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  animation: fade-in 0.3s ease 0.2s both;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.github-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--pico-color, #24292f);
+  background: var(--pico-card-background-color, #f6f8fa);
+  border: 1px solid var(--pico-muted-border-color, #d0d7de);
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background-color 0.15s;
+}
+
+.github-btn:hover {
+  background: var(--pico-muted-border-color, #d0d7de);
+  text-decoration: none;
+}
